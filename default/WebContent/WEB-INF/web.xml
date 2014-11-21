@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>default</display-name>
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>CapstoneWebUI.html</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <description>Sample Servlet</description>
+    <display-name>RunWorldServlet</display-name>
+    <servlet-name>RunWorldServlet</servlet-name>
+    <servlet-class>com.mirror.capstoneglass.RunWorldServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RunWorldServlet</servlet-name>
+    <url-pattern>/runworld</url-pattern>
+  </servlet-mapping>
+	
+  
+  
+  <!-- Servlet Update Location for Local App Request -->
+	<servlet>
+	    <servlet-name>UpdateLocation</servlet-name>
+	    <servlet-class>com.mirror.capstoneglass.UpdateLocationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>UpdateLocation</servlet-name>
+	    <url-pattern>/update</url-pattern>
+	</servlet-mapping>
+
+	
+	<!--  Callback Servlet for Authorization  -->
+	<servlet>
+	    <servlet-name>oauth2callback</servlet-name>
+	    <servlet-class>com.google.glassware.AuthServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>oauth2callback</servlet-name>
+	    <url-pattern>/oauth2callback</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Force HTTPS -->
+	<security-constraint>
+	    <web-resource-collection>
+	    	<web-resource-name>Protected Area</web-resource-name>
+	    	<url-pattern>/*</url-pattern>
+	    </web-resource-collection>
+	    <user-data-constraint>
+	        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+	    </user-data-constraint>
+	</security-constraint>
+	
+	<!-- Authorization Filters (2 Filters) -->
+	
+	 <filter>
+	    <filter-name>authFilter</filter-name>
+		<filter-class>com.google.glassware.AuthFilter</filter-class>
+	</filter>
+	<filter-mapping>
+	    <filter-name>authFilter</filter-name>
+	    <url-pattern>/auth</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+	    <filter-name>reauthFilter</filter-name>
+		<filter-class>com.google.glassware.ReauthFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+	    <filter-name>reauthFilter</filter-name>
+	    <url-pattern>/auth</url-pattern>
+	</filter-mapping>
+	<!-- Servlet for logging out of the web service  -->
+  
+</web-app>
