@@ -37,6 +37,7 @@ public class Location {
 	public ArrayList<String> locations_to_unlock;
 	public ArrayList<String> locations_to_retire;
 	
+	public String timeline_id;
 	
 	//Constructors
 	public Location()

@@ -17,6 +17,9 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.log.AppLogLine;
+import com.google.appengine.api.log.RequestLogs;
+import com.google.apphosting.api.logservice.LogServicePb.RequestLog;
 import com.tour.capstoneglass.*;
 
 public class TourUpdater implements Runnable{
@@ -63,13 +66,13 @@ public class TourUpdater implements Runnable{
 			    	  currLon = (double)e.getProperty("Longitude");
 			    	  timeStamp = (String)e.getProperty("Timestamp");
 			    	  
-			    	  //updates the location distance for each card
-			    	  //updateLocationDistance();
 			    	  
 			    	  //checks for unlocked locations
 			        for(Location loc : w.unlocked_locations){
 			        	if(isNearby(currLat, currLon, loc)){
 			        		updateLocationCards(loc);
+			        		
+			    
 			        		break;
 			        	}
 			        }
@@ -86,16 +89,20 @@ public class TourUpdater implements Runnable{
 			
 			//modify the location card to display its unlocked content, including its description
 			try {
-				TimelineItem timelineItem = timeline.get(loc.loc_id).execute();
+				TimelineItem timelineItem = timeline.get(loc.timeline_id).execute();
 				String html = loc.toUnlockedCard();
 				timelineItem.setHtml(html);
-				timeline.update(loc.loc_id, timelineItem).execute();
+				timeline.update(timelineItem.getId(), timelineItem).execute();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
+	
+			
+			
 			
 			//change location state in the database
-			loc.visited = true;
+			//loc.visited = true;
 			
 			//deletes this location card from the timeline
 			/*

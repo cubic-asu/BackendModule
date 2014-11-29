@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
   <application>capstoneglassapi</application>
-  <version>3</version>
+  <version>4</version>
   <module>default</module>
   <instance-class>B1</instance-class>
   <manual-scaling>

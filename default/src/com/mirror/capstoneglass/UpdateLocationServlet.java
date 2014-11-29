@@ -30,8 +30,8 @@ public class UpdateLocationServlet extends HttpServlet{
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException 
 	{
-		String latitude = req.getParameter("lat");
-		String longitude = req.getParameter("long");
+		double latitude = Double.parseDouble(req.getParameter("lat"));
+		double longitude = Double.parseDouble(req.getParameter("long"));
 		String email = req.getParameter("email");
 		
 		SimpleDateFormat sdf= new SimpleDateFormat("HH:mm:ss");
@@ -43,6 +43,8 @@ public class UpdateLocationServlet extends HttpServlet{
 		
 		DatastoreService dss = DatastoreServiceFactory.getDatastoreService();
 		Entity w = new Entity("Location Update", email);
+		
+		
 		w.setProperty("Latitude", latitude);
 		w.setProperty("Longitude", longitude);
 		w.setProperty("LocTimestamp", time_now);

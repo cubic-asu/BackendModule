@@ -47,14 +47,14 @@ public class Card {
 		return timelineItem;
 	}
 	
-	public static TimelineItem createMapCard(World w){
+	public static TimelineItem createMapCard(double latitude, double longitude, World w){
 		String html = "<article><figure><img src='glass://map?w=240&h=360&marker=0;";
 		
 		for (com.tour.capstoneglass.Location l : w.unlocked_locations)
 		{
 			html += String.valueOf(l.latitude) + "," + String.valueOf(l.longitude)+ "&marker=0;";
 		}
-		html += "33.419356,-111.917179'"; //current glass location
+		html += String.valueOf(latitude) + "," + String.valueOf(longitude); //current glass location
 		
 		html +=	"height='360' width='240'></figure><section><div class='text-auto-size'>" +
 				"<p>Multiple Markers</p></div></section></article>";

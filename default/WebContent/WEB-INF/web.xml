@@ -17,6 +17,15 @@
   </servlet-mapping>
 	
   
+  <servlet>
+    <servlet-name>capstoneWebUI</servlet-name>
+    <servlet-class>com.capstonewebui.server.DatabaseHandlerImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>capstoneWebUI</servlet-name>
+    <url-pattern>/databasehandlerimp</url-pattern>
+  </servlet-mapping>
   
   <!-- Servlet Update Location for Local App Request -->
 	<servlet>
