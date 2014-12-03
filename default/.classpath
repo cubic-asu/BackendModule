@@ -23,6 +23,5 @@
 	<classpathentry kind="lib" path="resources/servlet-api-2.5-6.1.14.jar"/>
 	<classpathentry kind="lib" path="resources/gwt-maps.jar"/>
 	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/mirror-v1r76lv1.18.0-rc"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

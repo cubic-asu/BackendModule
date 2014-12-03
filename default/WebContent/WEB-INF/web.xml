@@ -3,7 +3,7 @@
   <display-name>default</display-name>
   <!-- Default page to serve -->
   <welcome-file-list>
-    <welcome-file>CapstoneWebUI.html</welcome-file>
+    <welcome-file>index.html</welcome-file>
   </welcome-file-list>
   <servlet>
     <description>Sample Servlet</description>
@@ -17,15 +17,7 @@
   </servlet-mapping>
 	
   
-  <servlet>
-    <servlet-name>capstoneWebUI</servlet-name>
-    <servlet-class>com.capstonewebui.server.DatabaseHandlerImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>capstoneWebUI</servlet-name>
-    <url-pattern>/databasehandlerimp</url-pattern>
-  </servlet-mapping>
+   <!-- Servlet For GWT -->
   
   <!-- Servlet Update Location for Local App Request -->
 	<servlet>

@@ -30,18 +30,6 @@ public class TourBuilder {
 		worldcard.setIsBundleCover(true);
 		timeline.insert(worldcard).execute();
 		
-		//testing card
-		/*TimelineItem timelineItem = new TimelineItem()
-		.setHtml("<article>Bank of America is Far.</article>")
-		.setDisplayTime(new DateTime(new Date()))
-		.setNotification(new NotificationConfig().setLevel("Default"))
-		.setId("lester");
-
-		List<MenuItem> menuItemList = new ArrayList<MenuItem>();
-		menuItemList.add(new MenuItem().setAction("DELETE"));
-		timelineItem.setMenuItems(menuItemList);
-		timeline.insert(timelineItem).execute();*/
-		
 		
 		
 		

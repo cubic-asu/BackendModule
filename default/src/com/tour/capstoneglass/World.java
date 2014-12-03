@@ -9,6 +9,13 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.mirror.capstoneglass.Card;
 
 public class World
 {
@@ -18,8 +25,6 @@ public class World
 	public final static String ColUserId = "user_id";
 	public final static String ColName = "name";
 	public final static String ColDescription = "description";
-	public final static String ColUnlockedLocations = "unlocked_locations";
-	public final static String ColAllLocations = "all_locations";
 	
 	//Attributes
 	public String world_id;
@@ -27,7 +32,7 @@ public class World
 	public String name;
 	public String description;
 	public ArrayList<Location> unlocked_locations;
-	public HashMap<String, Location> all_locations;
+	public ArrayList<Location> all_locations;
 	
 	
 	//Constructors
@@ -38,7 +43,7 @@ public class World
 		name = "";
 		description = "";
 		unlocked_locations = new ArrayList<Location>();
-		all_locations = new HashMap<String,Location>();
+		all_locations = new ArrayList<Location>();
 	}
 	
 	public World(String id)
@@ -56,10 +61,11 @@ public class World
 			//TODO: How will we handle errors??
 			System.out.println("Enable to Retrieve Entity from Key<br>");
 			System.out.println(err.toString());
+			
 		}
 	}
 	
-	public World(String wId, String uId, String wName, String wDescription, ArrayList<Location> unlockedLocations, HashMap<String, Location> allLocations)
+	public World(String wId, String uId, String wName, String wDescription, ArrayList<Location> unlockedLocations, ArrayList<Location> allLocations)
 	{
 		world_id = wId;
 		user_id = uId;
@@ -90,10 +96,7 @@ public class World
 		description = (String)e.getProperty(ColDescription);
 		
 		unlocked_locations = new ArrayList<Location>();
-		all_locations = new HashMap<String, Location>();
-		
-		ArrayList<String> locationIds  = getLocationsArrayList(e.getProperty(ColUnlockedLocations));
-		getLocations(locationIds);	
+		getLocations((String)e.getProperty(ColWorldId));
 	}
 	
 	public Entity toEntity()
@@ -105,72 +108,42 @@ public class World
 		w.setProperty(ColUserId, user_id);
 		w.setProperty(ColName, name);
 		w.setProperty(ColDescription, description);
-		w.setProperty(ColUnlockedLocations, unlocked_locations);
 		//No need to set the all_loctions property as this is not stored in the datastore
 		
 		return w;
 	}
 	
-	private ArrayList<String> getLocationsArrayList(Object obj)
-	{
-		/**
-		 * Function will take an Object instance and attempt to cast to an ArrayList<String>. 
-		 * Used to retrieve an list of location ids. 
-		 */
-		ArrayList<String> a = new ArrayList<String>();
-		if (obj instanceof ArrayList)
-		{
-			ArrayList<?> temp = (ArrayList<?>)obj;
-			for (int i = 0; i < temp.size(); i++)
-				if (temp.get(i) instanceof String)
-					a.add((String)temp.get(i));
-		}
-		return a;
-	}
 	
 	
-	private void getLocations(ArrayList<String> a)
+	
+	private void getLocations(String worldName)throws IllegalArgumentException
 	{
-		/**
-		 * Function to populate unlocked_locations as well as all_locations  
-		 */
-		
-		for(String str : a)
-		{
-			Location l = new Location(str);
-			if (!l.equals(null))
-			{
-				unlocked_locations.add(l);
-				all_locations.put(str, l);
-				getLocationsRecursive(l.locations_to_unlock);	//recursively add locations to all_locations
+			
+			DatastoreService dss = DatastoreServiceFactory.getDatastoreService();
+			Filter worldFilter =   new FilterPredicate("world_name",FilterOperator.EQUAL, worldName);
+			Query q = new Query("Location").addSort("name", SortDirection.ASCENDING);
+			q.setFilter(worldFilter);
+			PreparedQuery pq = dss.prepare(q);
+			for (Entity result : pq.asIterable()) {
+				
+				Location temploc = new Location((String)result.getProperty("loc_id"), 
+						(String)result.getProperty("name"),
+						(String)result.getProperty("description"),
+						(double)result.getProperty("latitude"),
+						(double)result.getProperty("longitude"), 
+						(int)result.getProperty("unlock_threshold"), 
+						(boolean)result.getProperty("visited"), 
+						(boolean)result.getProperty("locked"), 
+						(ArrayList<String>)result.getProperty("locations_to_unlock"),
+						(ArrayList<String>)result.getProperty("locations_to_lock"));
+					all_locations.add(temploc);
+					if((boolean)result.getProperty("locked") == false){
+						unlocked_locations.add(temploc);
+					}
 			}
-		}
+			
 	}
 	
-	
-	private void getLocationsRecursive(ArrayList<String> a)
-	{
-		/**
-		 * Recursive function to populate all reachable locations in the current World.
-		 * Uses a depth first approach. 
-		 */
-		
-		//Base Case ArrayList size = 0
-		if (a.size() == 0)		
-			return;
-		else
-		{
-			for(String str : a)
-			{
-				Location l = new Location(str);
-				if (l != null)
-				{
-					all_locations.put(str, l);
-					getLocationsRecursive(l.locations_to_unlock);
-				}
-			}
-		}
-	}
 	
 	
 	public boolean addUpdateDataStore()
@@ -190,48 +163,6 @@ public class World
 		
 	}
 	
-	public String toString()
-	{
-		String s = String.format("%s: %s\n", ColWorldId, world_id);
-		s += String.format("%s: %s\n", ColUserId, user_id);
-		s += String.format("%s: %s\n", ColName, name);
-		s += String.format("%s: %s\n", ColDescription, description);
-		
-		s += String.format("%s: {", ColUnlockedLocations);
-		boolean firsttime = true;
-		for (int i = 0; i < unlocked_locations.size(); i++)
-		{
-			Location l = unlocked_locations.get(i);
-			if (firsttime)
-			{
-				 
-				s += l.loc_id;
-				firsttime = false;
-			}
-			else
-				s += ", " + l.loc_id;
-		}
-		
-		s += "}\n";
-		s += String.format("%s: {", ColAllLocations);
-		
-		firsttime = true;
-		
-		for (String locationId : all_locations.keySet())
-		{
-			if (firsttime)
-			{
-				s += locationId;
-				firsttime = false;
-			}
-			else
-				s += ", " + locationId;
-		}
-		
-		s += "}\n";
-		
-		return s;
-	}
 	
 	public String toString(boolean formatAsHtml)
 	{

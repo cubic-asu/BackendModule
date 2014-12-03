@@ -67,8 +67,8 @@ public class UpdateLocationServlet extends HttpServlet{
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException 
 	{
-		String latitude = req.getParameter("lat");
-		String longitude = req.getParameter("long");
+		double latitude = Double.parseDouble(req.getParameter("lat"));
+		double longitude = Double.parseDouble(req.getParameter("long"));
 		String email = req.getParameter("email");
 		
 		SimpleDateFormat sdf= new SimpleDateFormat("HH:mm:ss");
