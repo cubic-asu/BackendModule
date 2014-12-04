@@ -23,7 +23,7 @@ public class Location {
 	public final static String ColVisited = "visited";
 	public final static String ColLocked = "locked";	//TODO: Is this needed in our implementation???
 	public final static String ColLocationsToUnlock = "locations_to_unlock";
-	public final static String ColLocationsToRetire = "locations_to_retire";
+	public final static String ColLocationsToRetire = "locations_to_lock";
 	
 	//Attributes
 	public String loc_id;
@@ -252,20 +252,35 @@ public class Location {
 	//this function takes in lat/long from user and constructs a html string for a location card
 	public String toCard(double latitude, double longitude){
 		int dist = (int) Distance.getDistance(latitude,longitude,this.latitude,this.longitude);
-		String html = "<article><figure>" +
-				"<h1 class='text-auto-size'>" + name + "</h1><br/>" +
-				"<h2>Distance: " + String.valueOf(dist) + "KM</h2>" +
-				"</article></figure>";
+		String html = "<article><section><div class='text-auto-size'>" +
+				"<p style='text-align:center;' class='blue'>" + name + "</p></div>" +
+				"</section>" +
+				"<footer><div>Distance: " + String.valueOf(dist) + " KM</div>" +
+				"</footer></article>";
+		
 		
 		return html;
 	}
 	
 	//shows the unlocked card with a description 
 	public String toUnlockedCard(){
-		String html = "<article><figure>" +
-				"<h1 class='text-auto-size'>" + name + "</h1><br/>" +
-				"<p class='text-auto-size'>" + description + "</p>" +
-				"</article></figure>";
+		
+		String html = "<article><section><div class='text-auto-size'>" +
+				"<p style='text-align:center;' class='green'>" + name + "</p>" +
+				"<p>" + description + "</p></div>" +
+				"</section>" +
+				"</article>";
+		
+		return html;
+	}
+	
+	public String toRetiredCard(){
+		
+		String html = "<article><section><div class='text-auto-size'>" +
+				"<p style='text-align:center;' class='red'>" + name + "</p>" +
+				"<p style='text-align:center;'>Location is Retired Tap To Delete</p></div>" +
+				"</section>" +
+				"</article>";
 		
 		return html;
 	}

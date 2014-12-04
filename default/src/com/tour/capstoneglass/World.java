@@ -20,7 +20,7 @@ import com.mirror.capstoneglass.Card;
 public class World
 {
 	//String constants representing column names
-	public final static String EntityName = "World";
+	public final static String EntityName = "world";
 	public final static String ColWorldId = "world_id";
 	public final static String ColUserId = "user_id";
 	public final static String ColName = "name";
@@ -33,6 +33,7 @@ public class World
 	public String description;
 	public ArrayList<Location> unlocked_locations;
 	public ArrayList<Location> all_locations;
+	public String map_id;
 	
 	
 	//Constructors
@@ -49,19 +50,15 @@ public class World
 	public World(String id)
 	{
 		DatastoreService dss = DatastoreServiceFactory.getDatastoreService();
-		Key k = KeyFactory.createKey(EntityName, id);
-		
-		try
-		{
-			Entity e = dss.get(k);
-			updateWorldFromEntity(e);			
-		}
-		catch (EntityNotFoundException err)
-		{
-			//TODO: How will we handle errors??
-			System.out.println("Enable to Retrieve Entity from Key<br>");
-			System.out.println(err.toString());
-			
+		Filter worldFilter = new FilterPredicate("world_id", FilterOperator.EQUAL,
+				id);
+		Query q = new Query("world").addSort("name", SortDirection.ASCENDING);
+		q.setFilter(worldFilter);
+		PreparedQuery pq = dss.prepare(q);
+
+		for (Entity result : pq.asIterable()) {
+			updateWorldFromEntity(result);
+
 		}
 	}
 	
@@ -95,8 +92,11 @@ public class World
 		name = (String)e.getProperty(ColName);
 		description = (String)e.getProperty(ColDescription);
 		
+		all_locations = new ArrayList<Location>();
 		unlocked_locations = new ArrayList<Location>();
+		
 		getLocations((String)e.getProperty(ColWorldId));
+		
 	}
 	
 	public Entity toEntity()
@@ -121,7 +121,7 @@ public class World
 			
 			DatastoreService dss = DatastoreServiceFactory.getDatastoreService();
 			Filter worldFilter =   new FilterPredicate("world_name",FilterOperator.EQUAL, worldName);
-			Query q = new Query("Location").addSort("name", SortDirection.ASCENDING);
+			Query q = new Query("location").addSort("name", SortDirection.ASCENDING);
 			q.setFilter(worldFilter);
 			PreparedQuery pq = dss.prepare(q);
 			for (Entity result : pq.asIterable()) {
@@ -129,10 +129,10 @@ public class World
 				Location temploc = new Location((String)result.getProperty("loc_id"), 
 						(String)result.getProperty("name"),
 						(String)result.getProperty("description"),
-						(double)result.getProperty("latitude"),
-						(double)result.getProperty("longitude"), 
-						(int)result.getProperty("unlock_threshold"), 
-						(boolean)result.getProperty("visited"), 
+						Double.parseDouble((String) result.getProperty("latitude")),
+						Double.parseDouble((String) result.getProperty("longitude")), 
+						Integer.parseInt((String) result.getProperty("unlock_threshold")), 
+						Boolean.parseBoolean((String)result.getProperty("visited")), 
 						(boolean)result.getProperty("locked"), 
 						(ArrayList<String>)result.getProperty("locations_to_unlock"),
 						(ArrayList<String>)result.getProperty("locations_to_lock"));
@@ -142,6 +142,23 @@ public class World
 					}
 			}
 			
+	}
+	
+	public Location getLocationByName(String loc_name){
+		for(int i=0; i < all_locations.size(); i++){
+			if(all_locations.get(i).name.equalsIgnoreCase(loc_name)){
+				return all_locations.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public void addUnlockedLocations(ArrayList<String> loc_names){
+	
+		for(int i=0; i < loc_names.size(); i++){
+			Location loc = getLocationByName(loc_names.get(i));
+			unlocked_locations.add(loc);
+		}
 	}
 	
 	
@@ -163,6 +180,10 @@ public class World
 		
 	}
 	
+	public void setMapId(String id){
+		map_id = id;
+	}
+	
 	
 	public String toString(boolean formatAsHtml)
 	{
@@ -176,10 +197,13 @@ public class World
 	}
 	
 	public String toCard(){
-		String html = "<article><figure>" +
-				"<h1 class='text-auto-size'>" + name + "</h1><br/>" +
-				"<p class='text-auto-size'>" + description + "</p>" +
-				"</article></figure>";
+		
+		String html = "<article><section><div>" +
+				"<p style='text-align:center;'>" + name + "</p>" +
+				"<p style='font-size:0.5em'>"+ description + "</p></div>" +
+				"</section>" +
+				"<footer><div>Tap to Start</div>" +
+				"</footer></article>";
 		
 		return html;
 	}

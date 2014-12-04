@@ -30,7 +30,6 @@ public class TourUpdater implements Runnable{
 		double currLat;
 		double currLon;
 		String timeStamp;
-		int radius = 5; //needs to be changed for each location
 		World w; 
 		Timeline timeline;
 		
@@ -47,7 +46,7 @@ public class TourUpdater implements Runnable{
 			double latitude = location.latitude;
 			double longitude = location.longitude;
 			double distance = Distance.getDistance(currLat, currLon, latitude,longitude);
-			if(distance <= radius){
+			if(distance <= location.unlock_threshold){
 				isNearby = true;
 			}else{
 				isNearby = false;
@@ -71,8 +70,6 @@ public class TourUpdater implements Runnable{
 			        for(Location loc : w.unlocked_locations){
 			        	if(isNearby(currLat, currLon, loc)){
 			        		updateLocationCards(loc);
-			        		
-			    
 			        		break;
 			        	}
 			        }
@@ -96,25 +93,53 @@ public class TourUpdater implements Runnable{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-	
+			
+			loc.visited = true;
+			addNewlyUnlockedCards(loc.locations_to_unlock);
+			w.addUnlockedLocations(loc.locations_to_unlock);
+			retireLocationCards(loc.locations_to_retire);
 			
 			
 			
-			//change location state in the database
-			//loc.visited = true;
-			
-			//deletes this location card from the timeline
-			/*
+			//update map card
+			String map_html = Card.updateMapCard(currLat,currLon, w);
 			try {
-				timeline.delete(loc.loc_id);
+				TimelineItem timelineItem = timeline.get(w.map_id).execute();
+				timelineItem.setHtml(map_html);
+				timeline.update(timelineItem.getId(), timelineItem).execute();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			*/
 			
-			//adds recently unlocked cards to the timeline
-			
+		}
+		
+		public void addNewlyUnlockedCards(ArrayList<String> unlocked_locations){
+			for(int i=0; i < unlocked_locations.size(); i++){
+				Location l = w.getLocationByName(unlocked_locations.get(i));
+				try {
+					TimelineItem locationcard = Card.createLocationCard(l, l.toCard(currLat, currLon));
+					locationcard.setBundleId(w.world_id);
+					TimelineItem timelineid = timeline.insert(locationcard).execute();
+					l.timeline_id = timelineid.getId();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		public void retireLocationCards(ArrayList<String> retired_locations){
+			//modify the location card to show it is retired
+			for(int i=0; i < retired_locations.size(); i++){
+				Location loc = w.getLocationByName(retired_locations.get(i));
+				try {
+					TimelineItem timelineItem = timeline.get(loc.timeline_id).execute();
+					String html = loc.toRetiredCard();
+					timelineItem.setHtml(html);
+					timeline.update(timelineItem.getId(), timelineItem).execute();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 }

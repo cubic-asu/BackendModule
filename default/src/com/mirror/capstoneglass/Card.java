@@ -14,6 +14,8 @@ import com.google.api.services.mirror.model.NotificationConfig;
 import com.tour.capstoneglass.*;
 
 public class Card {
+	
+	private static String timeline_map_id;
 
 	public static TimelineItem createLocationCard(Location loc, String html){
 		
@@ -69,6 +71,28 @@ public class Card {
 		menuItemList.add(new MenuItem().setAction("DELETE"));
 		timelineItem.setMenuItems(menuItemList);
 		return timelineItem;
+	}
+	
+	public static String updateMapCard(double latitude, double longitude, World w){
+		String html = "<article><figure><img src='glass://map?w=240&h=360&marker=0;";
+		
+		for (com.tour.capstoneglass.Location l : w.unlocked_locations)
+		{
+			html += String.valueOf(l.latitude) + "," + String.valueOf(l.longitude)+ "&marker=0;";
+		}
+		html += String.valueOf(latitude) + "," + String.valueOf(longitude); //current glass location
+		
+		html +=	"height='360' width='240'></figure><section><div class='text-auto-size'>" +
+				"<p>Multiple Markers</p></div></section></article>";
+		
+		
+		return html;
+		
+		
+	}
+	
+	public static void setMapId(String id){
+		timeline_map_id = id;
 	}
 	
 }

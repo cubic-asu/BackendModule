@@ -51,7 +51,8 @@ public class TourBuilder {
 		//create map card
 				TimelineItem mapcard = Card.createMapCard(currLat,currLon,w);
 				mapcard.setBundleId(w.world_id);
-				timeline.insert(mapcard).execute();
+				TimelineItem mapid = timeline.insert(mapcard).execute();
+				w.setMapId(mapid.getId());
   	    
 		//create location cards
 		for (com.tour.capstoneglass.Location l : w.unlocked_locations)
