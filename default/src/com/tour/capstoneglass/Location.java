@@ -251,11 +251,11 @@ public class Location {
 	
 	//this function takes in lat/long from user and constructs a html string for a location card
 	public String toCard(double latitude, double longitude){
-		int dist = (int) Distance.getDistance(latitude,longitude,this.latitude,this.longitude);
+		int dist = (int) (Distance.getDistance(latitude,longitude,this.latitude,this.longitude) * 1000.0);
 		String html = "<article><section><div class='text-auto-size'>" +
 				"<p style='text-align:center;' class='blue'>" + name + "</p></div>" +
 				"</section>" +
-				"<footer><div>Distance: " + String.valueOf(dist) + " KM</div>" +
+				"<footer><div>Distance: " + String.valueOf(dist) + " Meters</div>" +
 				"</footer></article>";
 		
 		

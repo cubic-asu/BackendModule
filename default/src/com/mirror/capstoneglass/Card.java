@@ -83,7 +83,7 @@ public class Card {
 		html += String.valueOf(latitude) + "," + String.valueOf(longitude); //current glass location
 		
 		html +=	"height='360' width='240'></figure><section><div class='text-auto-size'>" +
-				"<p>Multiple Markers</p></div></section></article>";
+				"<p>Tour Overview</p></div></section></article>";
 		
 		
 		return html;

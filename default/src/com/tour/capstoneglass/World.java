@@ -16,6 +16,7 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.mirror.capstoneglass.Card;
+import com.google.appengine.api.datastore.Text;
 
 public class World
 {
@@ -90,12 +91,12 @@ public class World
 		world_id = (String)e.getProperty(ColWorldId);
 		user_id = (String)e.getProperty(ColUserId);
 		name = (String)e.getProperty(ColName);
-		description = (String)e.getProperty(ColDescription);
+		description = ((Text)e.getProperty(ColDescription)).getValue();
 		
 		all_locations = new ArrayList<Location>();
 		unlocked_locations = new ArrayList<Location>();
 		
-		getLocations((String)e.getProperty(ColWorldId));
+		getLocations((String)e.getProperty(ColName));
 		
 	}
 	
@@ -128,7 +129,7 @@ public class World
 				
 				Location temploc = new Location((String)result.getProperty("loc_id"), 
 						(String)result.getProperty("name"),
-						(String)result.getProperty("description"),
+						((Text)result.getProperty("description")).getValue(),
 						Double.parseDouble((String) result.getProperty("latitude")),
 						Double.parseDouble((String) result.getProperty("longitude")), 
 						Integer.parseInt((String) result.getProperty("unlock_threshold")), 
@@ -159,6 +160,15 @@ public class World
 			Location loc = getLocationByName(loc_names.get(i));
 			unlocked_locations.add(loc);
 		}
+	}
+	
+	public void removeUnlockedLocation(Location loc) {
+		for(int i=0; i < unlocked_locations.size(); i++){
+			if(unlocked_locations.get(i).name.equalsIgnoreCase(loc.name)){
+				unlocked_locations.remove(i);
+			}
+		}
+		
 	}
 	
 	
@@ -207,6 +217,8 @@ public class World
 		
 		return html;
 	}
+
+	
 	
 	
 }

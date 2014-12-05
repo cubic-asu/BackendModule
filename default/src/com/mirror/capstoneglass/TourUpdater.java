@@ -45,7 +45,7 @@ public class TourUpdater implements Runnable{
 			boolean isNearby;
 			double latitude = location.latitude;
 			double longitude = location.longitude;
-			double distance = Distance.getDistance(currLat, currLon, latitude,longitude);
+			double distance = (Distance.getDistance(currLat, currLon, latitude,longitude)) * 1000.0;
 			if(distance <= location.unlock_threshold){
 				isNearby = true;
 			}else{
@@ -93,8 +93,20 @@ public class TourUpdater implements Runnable{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			//update distances for each location card
+			for(int i=0; i < w.unlocked_locations.size(); i++){
+			try {
+				TimelineItem timelineItem2 = timeline.get(w.unlocked_locations.get(i).timeline_id).execute();
+				String html2 = w.unlocked_locations.get(i).toCard(currLat, currLon);
+				timelineItem2.setHtml(html2);
+				timeline.update(timelineItem2.getId(), timelineItem2).execute();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			}
 			
 			loc.visited = true;
+			w.removeUnlockedLocation(loc);
 			addNewlyUnlockedCards(loc.locations_to_unlock);
 			w.addUnlockedLocations(loc.locations_to_unlock);
 			retireLocationCards(loc.locations_to_retire);
