@@ -265,10 +265,9 @@ public class Location {
 	//shows the unlocked card with a description 
 	public String toUnlockedCard(){
 		
-		String html = "<article><section><div class='text-auto-size'>" +
+		String html = "<article class='auto-paginate'><div style='padding:10px' class='text-auto-size'>" +
 				"<p style='text-align:center;' class='green'>" + name + "</p>" +
 				"<p>" + description + "</p></div>" +
-				"</section>" +
 				"</article>";
 		
 		return html;
